@@ -1,48 +1,14 @@
-using System;
-using System.Reflection.Metadata.Ecma335;
 using API.Data;
 using API.Models;
-using Microsoft.AspNetCore.Mvc;
+using API.Startup;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-
-var connection = String.Empty;
-if (builder.Environment.IsDevelopment())
-{
-    builder.Configuration.AddEnvironmentVariables().AddJsonFile("appsettings.Development.json");
-    connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
-}
-else
-{
-    connection = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTIONSTRING");
-}
-
-builder.Services.AddDbContext<MyContext>(options =>
-    options.UseSqlServer(connection));
+builder.AddDependencies();
+builder.GetConnection();
 
 var app = builder.Build();
-
-
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/openapi/v1.json", "v1");
-    });
-    app.MapOpenApi();
-}
-
+app.UseOpenApi();
 app.UseHttpsRedirection();
 
 app.MapGet("/", () =>

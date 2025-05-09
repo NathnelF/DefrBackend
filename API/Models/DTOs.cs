@@ -33,15 +33,23 @@ public class ContractDto
     public bool? IsChurned { get; set; }
 }
 
+public class InvoiceDateDto
+{
+    public int ContractId { get; set; }
+    public DateTime InvoiceDate { get; set; }
+}
+
 public class RecognitionEventDto
 {
     public int Id { get; set; }
 
-    public int ServiceId { get; set; }
+    public string? ServiceName { get; set; }
 
-    public int CustomerId { get; set; }
+    public string? CustomerName { get; set; }
 
     public int ContractId { get; set; }
 
     public decimal? Amount { get; set; }
+
+    public DateTime Date { get; set; }
 }

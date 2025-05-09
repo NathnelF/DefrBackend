@@ -15,6 +15,8 @@ public partial class RecognitionEvent
 
     public decimal? Amount { get; set; }
 
+    public DateTime Date { get; set; }
+
     public virtual Contract Contract { get; set; } = null!;
 
     public virtual Customer Customer { get; set; } = null!;

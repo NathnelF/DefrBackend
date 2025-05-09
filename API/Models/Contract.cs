@@ -18,6 +18,7 @@ public partial class Contract
     public DateTime? CurrentTermStart { get; set; }
 
     public DateTime? CurrentTermEnd { get; set; }
+    public DateTime? InvoiceDate { get; set; }
 
     public int? TermLength { get; set; }
 

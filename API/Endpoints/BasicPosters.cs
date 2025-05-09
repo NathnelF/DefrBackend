@@ -72,7 +72,20 @@ public static class BasicPosters
         };
         db.Add(contract);
         await db.SaveChangesAsync();
-        return Results.Created($"contracts/{contract.Id}", contract);
+
+        var responseDto = new ContractDto
+        {
+            CustomerName = dto.CustomerName,
+            ServiceName = dto.ServiceName,
+            Price = contract.Price,
+            OriginalContractStart = contract.OriginalContractStart,
+            CurrentTermStart = contract.CurrentTermStart,
+            CurrentTermEnd = contract.CurrentTermEnd,
+            TermLength = contract.TermLength,
+            IsAutoRenew = contract.IsAutoRenew,
+            RenewalPriceIncrease = contract.RenewalPriceIncrease
+        };
+        return Results.Created($"contracts/{contract.Id}", responseDto);
 
     }
 

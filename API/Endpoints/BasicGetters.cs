@@ -12,6 +12,7 @@ public static class BasicGetters
         app.MapGet("/customers", GetAllCustomers);
         app.MapGet("/contracts", GetAllContracts);
         app.MapGet("/monthly_balances", GetMonthlyBalances);
+        app.MapGet("/schedules", GetScheduleFromContract);
 
     }
 
@@ -38,5 +39,33 @@ public static class BasicGetters
     {
         var MonthlyBalances = await db.MonthlyBalances.ToListAsync();
         return Results.Ok(MonthlyBalances);
+    }
+
+    public static async Task<IResult> GetScheduleFromContract(MyContext db, int contractId)
+    {
+        var contract = await db.Contracts
+            .Include(c => c.RecognitionEvents)
+            .Include(c => c.Customer)
+            .Include(c => c.Service)
+            .FirstOrDefaultAsync(c => c.Id == contractId);
+        if (contract == null)
+        {
+            return Results.BadRequest("Invalid Contract Id.");
+        }
+        var events = contract.RecognitionEvents;
+        if (events == null)
+        {
+            return Results.BadRequest("Events not generated.");
+        }
+        var eventDtos = events.Select(e => new RecognitionEventDto
+        (
+            e.Id,
+            contract.Service.Name ?? "Unknown Service",
+            contract.Customer.Name ?? "Unknown Contract",
+            e.ContractId,
+            e.Amount ?? 0,
+            e.Date
+        )).ToList();
+        return Results.Ok(eventDtos);
     }
 }

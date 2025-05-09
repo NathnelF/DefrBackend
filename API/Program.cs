@@ -18,6 +18,7 @@ app.MapGet("/", () =>
 
 app.MapBasicGetters();
 app.MapBasicPosters();
+app.MapScheduleEndpoints();
 
 app.Run();
 

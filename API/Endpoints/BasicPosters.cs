@@ -10,8 +10,8 @@ public static class BasicPosters
     {
         app.MapPost("/new_customer", AddCustomer);
         app.MapPost("/new_service", AddService);
-        app.MapPost("new_contract", AddContract);
-        app.MapPost("new_monthly_balance", AddMonthlyBalance);
+        app.MapPost("/new_contract", AddContract);
+        app.MapPost("/new_monthly_balance", AddMonthlyBalance);
 
     }
 

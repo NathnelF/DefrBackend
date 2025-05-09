@@ -52,4 +52,14 @@ public class RecognitionEventDto
     public decimal? Amount { get; set; }
 
     public DateTime Date { get; set; }
+
+    public RecognitionEventDto(int id, string serviceName, string customerName, int contractId, decimal amount, DateTime date)
+    {
+        Id = id;
+        ServiceName = serviceName;
+        CustomerName = customerName;
+        ContractId = contractId;
+        Amount = amount;
+        Date = date;
+    }
 }

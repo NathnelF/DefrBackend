@@ -15,6 +15,7 @@ public static class BasicGetters
 
     }
 
+    //TODO add try catch block to handle errors more gracefully.
     public static async Task<IResult> GetAllServices(MyContext db)
     {
         var services = await db.Services.ToListAsync();

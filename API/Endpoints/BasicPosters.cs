@@ -1,5 +1,6 @@
 ﻿using API.Data;
 using API.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Endpoints;
 
@@ -13,6 +14,8 @@ public static class BasicPosters
         app.MapPost("new_monthly_balance", AddMonthlyBalance);
 
     }
+
+    //TODO, add try catch blocks to handle errors more gracefully ( especially unique name violations on customer / service )
 
     public static async Task<IResult> AddCustomer(MyContext db, CustomerDto dto)
     {
@@ -38,10 +41,27 @@ public static class BasicPosters
 
     public static async Task<IResult> AddContract(MyContext db, ContractDto dto)
     {
-        var contract = new Contract
+        //these are indexed so lookup should be very fast.
+        var customer = await db.Customers.FirstOrDefaultAsync(c => c.Name == dto.CustomerName);
+        var service = await db.Services.FirstOrDefaultAsync(s => s.Name == dto.ServiceName);
+
+        if (customer == null && service == null)
         {
-            CustomerId = dto.CustomerId,
-            ServiceId = dto.ServiceId,
+            return Results.BadRequest("Enter valid Customer and Service");
+        }
+        if (customer == null)
+        {
+            return Results.BadRequest("Enter a valid Customer name"); //eventually prompt to add customer?
+        }
+        if (service == null)
+        {
+            return Results.BadRequest("Enter a valid Service name"); //eventually prompt to add service?
+        }
+        
+        var contract = new Contract
+        { 
+            CustomerId = customer.Id,
+            ServiceId = service.Id,
             Price = dto.Price,
             OriginalContractStart = dto.OriginalContractStart,
             CurrentTermStart = dto.CurrentTermStart,

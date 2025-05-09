@@ -72,6 +72,7 @@ public partial class MyContext : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+            entity.HasIndex(c => c.Name).IsUnique();
         });
 
         modelBuilder.Entity<MonthlyBalance>(entity =>
@@ -120,6 +121,7 @@ public partial class MyContext : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(50)
                 .IsUnicode(false);
+            entity.HasIndex(e => e.Name).IsUnique();
         });
 
         modelBuilder.Entity<User>(entity =>

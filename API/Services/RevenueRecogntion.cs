@@ -1,5 +1,6 @@
 ﻿using API.Data;
 using API.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Services;
 
@@ -18,7 +19,7 @@ public class RevenueRecogntionHandler
 
         if (contract.CurrentTermStart == null || contract.TermLength <= 0)
         {
-            //return empty if we don't have a current start or the term length doesn't make sense. We'll check for empty events and throw an error later.
+            //loop can't run without CurrentStart or Term length < 0.
             throw new InvalidOperationException("Contract must have a term start. Contract must have a term length greater than 0");
         }
 
@@ -42,6 +43,11 @@ public class RevenueRecogntionHandler
     {
         await _db.AddRangeAsync(events);
         await _db.SaveChangesAsync();
+    }
+
+    public async Task ClearSchedulesFromDb(int contractId)
+    {
+        await _db.RecognitionEvents.Where(e => e.Id == contractId).ExecuteDeleteAsync();
     }
 
 }

@@ -15,10 +15,15 @@ public static class ScheduleEndpoints
         var contract = await db.Contracts
             .Include(c => c.Customer)
             .Include(c => c.Service)
+            .Include(c => c.RecognitionEvents)
             .FirstOrDefaultAsync(c => c.Id == Id);
         if (contract == null)
         {
             return Results.BadRequest("Enter a valid contract Id");
+        }
+        if (contract.RecognitionEvents.Any())
+        {
+            return Results.Ok("Recognition Schedule already generated for this contract!");
         }
         var service = new RevenueRecogntionHandler(db);
         var events = service.GenerateRecogntionEventsByContract(contract);

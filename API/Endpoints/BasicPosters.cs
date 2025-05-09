@@ -9,6 +9,8 @@ public static class BasicPosters
     {
         app.MapPost("/new_customer", AddCustomer);
         app.MapPost("/new_service", AddService);
+        app.MapPost("new_contract", AddContract);
+        app.MapPost("new_monthly_balance", AddMonthlyBalance);
 
     }
 
@@ -32,5 +34,38 @@ public static class BasicPosters
         db.Add(service);
         await db.SaveChangesAsync();
         return Results.Created($"services/{service.Id}", service);
+    }
+
+    public static async Task<IResult> AddContract(MyContext db, ContractDto dto)
+    {
+        var contract = new Contract
+        {
+            CustomerId = dto.CustomerId,
+            ServiceId = dto.ServiceId,
+            Price = dto.Price,
+            OriginalContractStart = dto.OriginalContractStart,
+            CurrentTermStart = dto.CurrentTermStart,
+            CurrentTermEnd = dto.CurrentTermEnd,
+            TermLength = dto.TermLength,
+            IsAutoRenew = dto.IsAutoRenew,
+            RenewalPriceIncrease = dto.RenewalPriceIncrease
+        };
+        db.Add(contract);
+        await db.SaveChangesAsync();
+        return Results.Created($"contracts/{contract.Id}", contract);
+
+    }
+
+    public static async Task<IResult> AddMonthlyBalance(MyContext db, MonthlyBalance mb)
+    {
+        var monthlyBalance = new MonthlyBalance
+        {
+            Month = mb.Month,
+            Year = mb.Year,
+            Balance = mb.Balance
+        };
+        db.Add(monthlyBalance);
+        await db.SaveChangesAsync();
+        return Results.Created($"monthly_balances/{monthlyBalance.Id}", monthlyBalance);
     }
 }

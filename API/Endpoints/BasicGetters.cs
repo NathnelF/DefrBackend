@@ -19,25 +19,51 @@ public static class BasicGetters
     //TODO add try catch block to handle errors more gracefully.
     public static async Task<IResult> GetAllServices(MyContext db)
     {
-        var services = await db.Services.ToListAsync();
+        var services = await db.Services
+            .AsNoTracking()
+            .Select(s => s.Name)
+            .ToListAsync();
         return Results.Ok(services);
     }
 
     public static async Task<IResult> GetAllCustomers(MyContext db)
     {
-        var customers = await db.Customers.ToListAsync();
+        var customers = await db.Customers
+            .AsNoTracking()
+            .Select(c => c.Name)
+            .ToListAsync();
         return Results.Ok(customers);   
     }
 
     public static async Task<IResult> GetAllContracts(MyContext db)
     {
-        var contracts = await db.Contracts.ToListAsync();
+        var contracts = await db.Contracts
+            .AsNoTracking()
+            .Select(c => new
+            {
+                c.CustomerId,
+                c.ServiceId,
+                c.Price,
+                c.CurrentTermStart,
+                c.CurrentTermEnd,
+                c.TermLength,
+                c.OriginalContractStart,
+                c.IsAutoRenew,
+                c.IsChurned
+            })
+            .ToListAsync();
         return Results.Ok(contracts);
     }
 
     public static async Task<IResult> GetMonthlyBalances(MyContext db)
     {
-        var MonthlyBalances = await db.MonthlyBalances.ToListAsync();
+        var MonthlyBalances = await db.MonthlyBalances
+            .AsNoTracking()
+            .Select(mb => new { 
+                mb.Month,
+                mb.Balance
+            })
+            .ToListAsync();
         return Results.Ok(MonthlyBalances);
     }
 

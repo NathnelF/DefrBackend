@@ -9,6 +9,8 @@ public static class ScheduleEndpoints
     public static void MapScheduleEndpoints(this WebApplication app)
     {
         app.MapPost("/gen_schedule", GenerateScheduleFromContract);
+        app.MapPut("/update_schedule_invoice_amount", AlterInvoiceDate);
+
     }
     public static async Task<IResult> GenerateScheduleFromContract(MyContext db, int Id)
     {
@@ -44,5 +46,12 @@ public static class ScheduleEndpoints
             e.Date
         )).ToList();
         return Results.Created($"schedules/{Id}", eventDtos);
+    }
+
+    public static async Task<IResult> AlterInvoiceDate(MyContext db, int Id)
+    {
+        var service = new RevenueRecogntionHandler(db);
+        await service.UpdateScheduleForInvoice(Id);
+        return Results.Ok($"Updated recognized amount for invoice date in contrcact {Id}");
     }
 }

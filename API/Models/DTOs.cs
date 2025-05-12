@@ -33,6 +33,32 @@ public class ContractDto
     public bool? IsChurned { get; set; }
 }
 
+public class ContractUpdateDTO
+{
+    //same as contract DTO but you can't update the customer or service... if you need to change htose you should be making a new contract.
+    public decimal Price { get; set; }
+
+    public DateTime? OriginalContractStart { get; set; }
+
+    public DateTime? CurrentTermStart { get; set; }
+
+    public DateTime? CurrentTermEnd { get; set; }
+
+    public int? TermLength { get; set; }
+
+    public bool? IsAutoRenew { get; set; }
+
+    public decimal? RenewalPriceIncrease { get; set; }
+
+    public bool? IsChurned { get; set; }
+
+}   
+
+public class UpdateInvoiceDateDTO
+{
+    public DateTime? InvoiceDate { get; set; }
+}
+
 public class InvoiceDateDto
 {
     public int ContractId { get; set; }

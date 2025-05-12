@@ -30,7 +30,7 @@ public class RevenueRecogntionHandler
                 ContractId = contract.Id,
                 ServiceId = contract.ServiceId,
                 CustomerId = contract.CustomerId,
-                Amount = contract.Price / contract.TermLength,
+                Amount = (contract.Price / contract.TermLength) * -1,
                 Date = contract.CurrentTermStart.Value.AddMonths(i)
             });
 
@@ -47,7 +47,38 @@ public class RevenueRecogntionHandler
 
     public async Task ClearSchedulesFromDb(int contractId)
     {
-        await _db.RecognitionEvents.Where(e => e.Id == contractId).ExecuteDeleteAsync();
+        await _db.RecognitionEvents.Where(e => e.ContractId == contractId).ExecuteDeleteAsync();
+    }
+
+    public async Task UpdateScheduleForInvoice(int contractId)
+    {
+        var contract = await _db.Contracts.FirstOrDefaultAsync(c => c.Id == contractId);
+        if (contract == null)
+        {
+            throw new InvalidOperationException($"Can't find contract with Id {contractId}");
+        }
+        if (contract.InvoiceDate != null)
+        {
+            var invoiceEvent = await _db.RecognitionEvents
+                .Where(e => e.ContractId == contractId 
+                && e.Date.Month == contract.InvoiceDate.Value.Month).FirstOrDefaultAsync();
+            if (invoiceEvent != null)
+            {
+                //TODO, make sure all other events are just Price / TermLength!! 
+                invoiceEvent.Amount += contract.Price;
+                await _db.SaveChangesAsync();
+            }
+            else
+            {
+                throw new InvalidOperationException($"Can't find event associated with invoice date {contract.InvoiceDate.Value} in contract {contractId}");
+            }
+        }
+        else
+        {
+            throw new InvalidOperationException($"Can't find an invoie date for contract {contractId}");
+        }
+        
+        
     }
 
 }

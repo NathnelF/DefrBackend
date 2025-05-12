@@ -20,6 +20,7 @@ app.MapBasicGetters();
 app.MapBasicPosters();
 app.MapScheduleEndpoints();
 app.MapBasicDeleters();
+app.MapBasicUpdaters();
 
 app.Run();
 

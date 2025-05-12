@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using API.Models;
 using API.Data;
+using System.Diagnostics.Contracts;
 
 namespace API.Endpoints;
 
@@ -13,6 +14,7 @@ public static class BasicGetters
         app.MapGet("/contracts", GetAllContracts);
         app.MapGet("/monthly_balances", GetMonthlyBalances);
         app.MapGet("/schedules", GetScheduleFromContract);
+        app.MapGet("/contractByNames", GetContractFromCustomerAndService);
 
     }
 
@@ -94,5 +96,42 @@ public static class BasicGetters
             e.Date
         )).ToList();
         return Results.Ok(eventDtos);
+    }
+
+    public static async Task<IResult> GetContractFromCustomerAndService(MyContext db, string customerName, string serviceName)
+    {
+        var customer = await db.Customers.AsNoTracking().FirstOrDefaultAsync(c => c.Name == customerName);
+        if (customer == null)
+        {
+            return Results.BadRequest("Can't find customer with that name");
+        }
+        var service = await db.Services.AsNoTracking().FirstOrDefaultAsync(s => s.Name == serviceName);
+        if (service == null) 
+        {
+            return Results.BadRequest("Cant' find service with that name");
+        }
+        var contract = await db.Contracts
+            .AsNoTracking()
+            .Where(c => c.CustomerId == customer.Id && c.ServiceId == service.Id)
+            .Select(c => new
+            {
+                c.CustomerId,
+                c.ServiceId,
+                c.Price,
+                c.CurrentTermStart,
+                c.CurrentTermEnd,
+                c.TermLength,
+                c.OriginalContractStart,
+                c.InvoiceDate,
+                c.IsAutoRenew,
+                c.IsChurned
+            }).FirstOrDefaultAsync();
+
+        if (contract == null)
+        {
+            return Results.BadRequest($"Can't find contract of name {customerName} {serviceName}");
+        }
+            
+        return Results.Ok(contract);
     }
 }

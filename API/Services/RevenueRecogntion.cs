@@ -52,32 +52,46 @@ public class RevenueRecogntionHandler
 
     public async Task UpdateScheduleForInvoice(int contractId)
     {
+        //get contract and check if it exists
         var contract = await _db.Contracts.FirstOrDefaultAsync(c => c.Id == contractId);
         if (contract == null)
         {
             throw new InvalidOperationException($"Can't find contract with Id {contractId}");
         }
-        if (contract.InvoiceDate != null)
+        //check if contract has an invoice date and term length.
+        if (contract.InvoiceDate == null || contract.TermLength == null)
         {
-            var invoiceEvent = await _db.RecognitionEvents
-                .Where(e => e.ContractId == contractId 
-                && e.Date.Month == contract.InvoiceDate.Value.Month).FirstOrDefaultAsync();
-            if (invoiceEvent != null)
+            throw new InvalidOperationException($"Can't find an invoie date or term length for contract {contractId}");
+        }
+
+        if (contract.TermLength <= 0 || contract.Price <= 0) 
+        {
+            throw new InvalidOperationException($"Price and term length must be greater than 0");
+        }
+        //query events from that contract and check if they exist
+        var events = await _db.RecognitionEvents
+            .Where(e => e.ContractId == contractId).ToListAsync();
+        if (events == null || !events.Any())
+        {
+            throw new InvalidOperationException($"Can't find any recognition event for this contract.");
+        }
+        //look for invoice date within the events in memory
+        //this should be fine because we shouldn't ever have more than 12 - 36 events in a single schedule.
+        var standardAmount = -1 * (contract.Price / contract.TermLength);
+        var invoicedAmount = contract.Price + standardAmount;
+        foreach (var recognitionEvent in events)
+        {
+            if (recognitionEvent.Date.Month == contract.InvoiceDate.Value.Month)
             {
-                //TODO, make sure all other events are just Price / TermLength!! 
-                invoiceEvent.Amount += contract.Price;
-                await _db.SaveChangesAsync();
+                recognitionEvent.Amount = invoicedAmount;
             }
             else
             {
-                throw new InvalidOperationException($"Can't find event associated with invoice date {contract.InvoiceDate.Value} in contract {contractId}");
+                recognitionEvent.Amount = standardAmount;
             }
+
         }
-        else
-        {
-            throw new InvalidOperationException($"Can't find an invoie date for contract {contractId}");
-        }
-        
+        await _db.SaveChangesAsync();
         
     }
 

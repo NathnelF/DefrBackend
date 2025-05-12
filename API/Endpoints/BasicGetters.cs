@@ -48,6 +48,7 @@ public static class BasicGetters
                 c.CurrentTermEnd,
                 c.TermLength,
                 c.OriginalContractStart,
+                c.InvoiceDate,
                 c.IsAutoRenew,
                 c.IsChurned
             })

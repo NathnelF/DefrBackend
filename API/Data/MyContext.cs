@@ -111,6 +111,7 @@ public partial class MyContext : DbContext
                 .HasForeignKey(d => d.ServiceId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_RecognitionEvent_Services");
+            entity.HasIndex(e => e.ContractId);
         });
 
         modelBuilder.Entity<Service>(entity =>

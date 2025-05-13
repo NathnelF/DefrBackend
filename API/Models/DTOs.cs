@@ -65,6 +65,28 @@ public class InvoiceDateDto
     public DateTime InvoiceDate { get; set; }
 }
 
+public class ContractDataForScheduleDto
+{
+    public int ContractId { get; set; }
+    public int ServiceId { get; set; }
+    public int CustomerId { get; set; }
+    public decimal Price { get; set; }
+
+    public int? TermLength { get; set; }
+    public DateTime? CurrentTermStart { get; set; }
+
+    public ContractDataForScheduleDto(int contractId, int serviceId, int customerId, decimal price, int? termLength, DateTime? currentTermStart)
+    {
+        ContractId = contractId;
+        ServiceId = serviceId;
+        CustomerId = customerId;
+        Price = price;
+        TermLength = termLength;
+        CurrentTermStart = currentTermStart;
+    }
+}
+
+
 public class RecognitionEventDto
 {
     public int Id { get; set; }

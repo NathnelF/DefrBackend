@@ -8,7 +8,7 @@ public static class BasicDeleters
 {
     public static void MapBasicDeleters(this WebApplication app)
     {
-        app.MapDelete("/clear_schedules", ClearScheduleById);
+        app.MapDelete("/clear_schedule", ClearScheduleById);
         app.MapDelete("/delete_contract", DeleteContractById);
     }
 

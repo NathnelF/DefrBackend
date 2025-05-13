@@ -72,30 +72,11 @@ public static class BasicGetters
 
     public static async Task<IResult> GetScheduleFromContract(MyContext db, int contractId)
     {
-        var contract = await db.Contracts
-            .Include(c => c.RecognitionEvents)
-            .Include(c => c.Customer)
-            .Include(c => c.Service)
-            .FirstOrDefaultAsync(c => c.Id == contractId);
-        if (contract == null)
-        {
-            return Results.BadRequest("Invalid Contract Id.");
-        }
-        var events = contract.RecognitionEvents;
-        if (events == null)
-        {
-            return Results.BadRequest("Events not generated.");
-        }
-        var eventDtos = events.Select(e => new RecognitionEventDto
-        (
-            e.Id,
-            contract.Service.Name ?? "Unknown Service",
-            contract.Customer.Name ?? "Unknown Contract",
-            e.ContractId,
-            e.Amount ?? 0,
-            e.Date
-        )).ToList();
-        return Results.Ok(eventDtos);
+        var events = await db.RecognitionEvents.Where(c => c.ContractId == contractId).ToListAsync();
+
+        if (events == null) return Results.BadRequest("Cannot find events with that id");
+
+        return Results.Ok(events);
     }
 
     public static async Task<IResult> GetContractFromCustomerAndService(MyContext db, string customerName, string serviceName)

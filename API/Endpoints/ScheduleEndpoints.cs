@@ -1,4 +1,5 @@
-﻿using API.Data;
+﻿using System.Linq;
+using API.Data;
 using API.Models;
 using API.Services;
 using Microsoft.EntityFrameworkCore;
@@ -12,22 +13,31 @@ public static class ScheduleEndpoints
         app.MapPut("/update_schedule_invoice_amount", AlterInvoiceDate);
 
     }
-    public static async Task<IResult> GenerateScheduleFromContract(MyContext db, int Id)
+    public static async Task<IResult> GenerateScheduleFromContract(MyContext db, int contractId)
     {
+        bool eventsExist = await db.RecognitionEvents.AnyAsync(r => r.ContractId == contractId);
+        if (eventsExist)
+        {
+            return Results.Ok("Recognition Schedule already generated for this contract!");
+        }
         var contract = await db.Contracts
-            .Include(c => c.Customer)
-            .Include(c => c.Service)
-            .Include(c => c.RecognitionEvents)
-            .FirstOrDefaultAsync(c => c.Id == Id);
+            .Where(c => c.Id == contractId)
+            .Select(c => new ContractDataForScheduleDto(
+                c.Id,
+                c.ServiceId,
+                c.CustomerId,
+                c.Price,
+                c.TermLength,
+                c.CurrentTermStart
+                )).FirstOrDefaultAsync(); 
+
+
         if (contract == null)
         {
             return Results.BadRequest("Enter a valid contract Id");
         }
-        if (contract.RecognitionEvents.Any())
-        {
-            return Results.Ok("Recognition Schedule already generated for this contract!");
-        }
         var service = new RevenueRecogntionHandler(db);
+
         var events = service.GenerateRecogntionEventsByContract(contract);
         if (events == null)
         {
@@ -36,16 +46,7 @@ public static class ScheduleEndpoints
         }
         await service.CommitEventsToDb(events);
 
-        var eventDtos = events.Select(e => new RecognitionEventDto
-        (
-            e.Id, 
-            contract.Service.Name ?? "Unknown Service", 
-            contract.Customer.Name ?? "Unknown Contract", 
-            e.ContractId, 
-            e.Amount ?? 0, 
-            e.Date
-        )).ToList();
-        return Results.Created($"schedules/{Id}", eventDtos);
+        return Results.Ok($"Schedules generated for {contractId}");
     }
 
     public static async Task<IResult> AlterInvoiceDate(MyContext db, int Id)

@@ -21,7 +21,7 @@ public static class ConnectToDb
         if (connection != null)
         {
             builder.Services.AddDbContext<MyContext>(options =>
-                options.UseSqlServer(connection));
+                options.UseSqlServer(connection).LogTo(Console.WriteLine, LogLevel.Information));
 
         }
         else

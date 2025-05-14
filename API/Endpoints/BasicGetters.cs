@@ -72,7 +72,10 @@ public static class BasicGetters
 
     public static async Task<IResult> GetScheduleFromContract(MyContext db, int contractId)
     {
-        var events = await db.RecognitionEvents.Where(c => c.ContractId == contractId).ToListAsync();
+        var events = await db.RecognitionEvents
+            .Where(c => c.ContractId == contractId)
+            .Select(c=> new { c.ContractId, c.Amount, c.Date } )
+            .ToListAsync();
 
         if (events == null) return Results.BadRequest("Cannot find events with that id");
 

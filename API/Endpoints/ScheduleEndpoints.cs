@@ -38,13 +38,8 @@ public static class ScheduleEndpoints
         }
         var service = new RevenueRecogntionHandler(db);
 
-        var events = service.GenerateRecogntionEventsByContract(contract);
-        if (events == null)
-        {
-            //TODO more detailed error here.
-            return Results.BadRequest("Could not generate events from contract");
-        }
-        await service.CommitEventsToDb(events);
+        await service.GenerateRecogntionEventsByContract(contract);
+        
 
         return Results.Ok($"Schedules generated for {contractId}");
     }

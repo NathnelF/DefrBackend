@@ -13,7 +13,7 @@ public class RevenueRecogntionHandler
         _db = db; 
     }
 
-    public List<RecognitionEvent> GenerateRecogntionEventsByContract(ContractDataForScheduleDto contract)
+    public async Task<IResult> GenerateRecogntionEventsByContract(ContractDataForScheduleDto contract)
     {
 
         if (contract.CurrentTermStart == null || contract.TermLength <= 0)
@@ -23,7 +23,7 @@ public class RevenueRecogntionHandler
         }
 
         var monthlyAmount = (contract.Price / contract.TermLength * -1);
-        return Enumerable.Range(0, (int)contract.TermLength!)
+        await _db.AddRangeAsync(Enumerable.Range(0, (int)contract.TermLength!)
             .Select(i => new RecognitionEvent
             {
                 ContractId = contract.ContractId,
@@ -32,21 +32,18 @@ public class RevenueRecogntionHandler
                 Amount = monthlyAmount,
                 Date = contract.CurrentTermStart.Value.AddMonths(i)
 
-            }).ToList();
+            }));
+        await _db.SaveChangesAsync();
+        return Results.Ok("Created recognition events");
     }
 
-    public async Task CommitEventsToDb(List<RecognitionEvent> events)
-    {
-        await _db.AddRangeAsync(events);
-        await _db.SaveChangesAsync();
-    }
 
     public async Task ClearSchedulesFromDb(int contractId)
     {
         await _db.RecognitionEvents.Where(e => e.ContractId == contractId).ExecuteDeleteAsync();
     }
 
-    public async Task UpdateScheduleForInvoice(int contractId)
+    public async Task<IResult> UpdateScheduleForInvoice(int contractId)
     {
         //get contract and check if it exists
         var contract = await _db.Contracts
@@ -60,30 +57,31 @@ public class RevenueRecogntionHandler
             .FirstOrDefaultAsync();
         if (contract == null)
         {
-            throw new InvalidOperationException($"Can't find contract with Id {contractId}");
+            return Results.NotFound($"Can't find contract with Id {contractId}");
         }
         //check if contract has an invoice date and term length.
         if (contract.InvoiceDate == null || contract.TermLength == null)
         {
-            throw new InvalidOperationException($"Can't find an invoie date or term length for contract {contractId}");
+            return Results.NotFound($"Can't find an invoie date or term length for contract {contractId}");
         }
 
         if (contract.TermLength <= 0 || contract.Price <= 0) 
         {
-            throw new InvalidOperationException($"Price and term length must be greater than 0");
+            return Results.NotFound($"Price and term length must be greater than 0");
         }
         //query events from that contract and check if they exist
         var eventsExist = await _db.RecognitionEvents
             .AnyAsync(e => e.ContractId == contractId);
         if (!eventsExist)
         {
-            throw new InvalidOperationException($"Can't find any recognition event for this contract.");
+            return Results.NotFound($"Can't find any recognition event for this contract.");
         }
         //look for invoice date within the events in memory
         //this should be fine because we shouldn't ever have more than 12 - 36 events in a single schedule.
         var standardAmount = -1 * (contract.Price / contract.TermLength);
         var invoicedAmount = contract.Price + standardAmount;
         var invoiceMonth = contract.InvoiceDate.Value.Month;
+
 
         await _db.RecognitionEvents
             .Where(e => e.ContractId == contractId && e.Date.Month == invoiceMonth)
@@ -92,10 +90,12 @@ public class RevenueRecogntionHandler
 
         await _db.RecognitionEvents
             .Where(e => e.ContractId == contractId && e.Date.Month != invoiceMonth)
-            .ExecuteUpdateAsync(s => 
+            .ExecuteUpdateAsync(s =>
             s.SetProperty(e => e.Amount, standardAmount));
-        
+
         await _db.SaveChangesAsync();
+
+        return Results.Ok("Updated recogntion invoice date");
         
     }
 

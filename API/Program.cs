@@ -21,6 +21,7 @@ app.MapBasicPosters();
 app.MapScheduleEndpoints();
 app.MapBasicDeleters();
 app.MapBasicUpdaters();
+app.MapReportEndpoints();
 
 app.Run();
 

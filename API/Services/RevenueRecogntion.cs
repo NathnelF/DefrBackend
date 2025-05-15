@@ -27,8 +27,6 @@ public class RevenueRecogntionHandler
             .Select(i => new RecognitionEvent
             {
                 ContractId = contract.ContractId,
-                ServiceId = contract.ServiceId,
-                CustomerId = contract.CustomerId,
                 Amount = monthlyAmount,
                 Date = contract.CurrentTermStart.Value.AddMonths(i)
 

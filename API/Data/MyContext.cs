@@ -94,23 +94,12 @@ public partial class MyContext : DbContext
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.Amount).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.ContractId).HasColumnName("ContractID");
-            entity.Property(e => e.CustomerId).HasColumnName("CustomerID");
-            entity.Property(e => e.ServiceId).HasColumnName("ServiceID");
 
             entity.HasOne(d => d.Contract).WithMany(p => p.RecognitionEvents)
                 .HasForeignKey(d => d.ContractId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_RecognitionEvent_Contracts");
 
-            entity.HasOne(d => d.Customer).WithMany(p => p.RecognitionEvents)
-                .HasForeignKey(d => d.CustomerId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_RecognitionEvent_Customers");
-
-            entity.HasOne(d => d.Service).WithMany(p => p.RecognitionEvents)
-                .HasForeignKey(d => d.ServiceId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_RecognitionEvent_Services");
             entity.HasIndex(e => e.ContractId);
         });
 

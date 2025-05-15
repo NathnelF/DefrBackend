@@ -11,5 +11,4 @@ public partial class Service
 
     public virtual ICollection<Contract> Contracts { get; set; } = new List<Contract>();
 
-    public virtual ICollection<RecognitionEvent> RecognitionEvents { get; set; } = new List<RecognitionEvent>();
 }

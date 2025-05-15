@@ -87,27 +87,4 @@ public class ContractDataForScheduleDto
 }
 
 
-public class RecognitionEventDto
-{
-    public int Id { get; set; }
 
-    public string? ServiceName { get; set; }
-
-    public string? CustomerName { get; set; }
-
-    public int ContractId { get; set; }
-
-    public decimal? Amount { get; set; }
-
-    public DateTime Date { get; set; }
-
-    public RecognitionEventDto(int id, string serviceName, string customerName, int contractId, decimal amount, DateTime date)
-    {
-        Id = id;
-        ServiceName = serviceName;
-        CustomerName = customerName;
-        ContractId = contractId;
-        Amount = amount;
-        Date = date;
-    }
-}

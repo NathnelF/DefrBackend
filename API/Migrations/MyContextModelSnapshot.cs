@@ -146,25 +146,13 @@ namespace API.Migrations
                         .HasColumnType("int")
                         .HasColumnName("ContractID");
 
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int")
-                        .HasColumnName("CustomerID");
-
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("ServiceId")
-                        .HasColumnType("int")
-                        .HasColumnName("ServiceID");
 
                     b.HasKey("Id")
                         .HasName("PK__Recognit__3214EC278FF09EA3");
 
                     b.HasIndex("ContractId");
-
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("ServiceId");
 
                     b.ToTable("RecognitionEvent", (string)null);
                 });
@@ -256,23 +244,7 @@ namespace API.Migrations
                         .IsRequired()
                         .HasConstraintName("FK_RecognitionEvent_Contracts");
 
-                    b.HasOne("API.Models.Customer", "Customer")
-                        .WithMany("RecognitionEvents")
-                        .HasForeignKey("CustomerId")
-                        .IsRequired()
-                        .HasConstraintName("FK_RecognitionEvent_Customers");
-
-                    b.HasOne("API.Models.Service", "Service")
-                        .WithMany("RecognitionEvents")
-                        .HasForeignKey("ServiceId")
-                        .IsRequired()
-                        .HasConstraintName("FK_RecognitionEvent_Services");
-
                     b.Navigation("Contract");
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("Service");
                 });
 
             modelBuilder.Entity("API.Models.Contract", b =>
@@ -283,15 +255,11 @@ namespace API.Migrations
             modelBuilder.Entity("API.Models.Customer", b =>
                 {
                     b.Navigation("Contracts");
-
-                    b.Navigation("RecognitionEvents");
                 });
 
             modelBuilder.Entity("API.Models.Service", b =>
                 {
                     b.Navigation("Contracts");
-
-                    b.Navigation("RecognitionEvents");
                 });
 #pragma warning restore 612, 618
         }

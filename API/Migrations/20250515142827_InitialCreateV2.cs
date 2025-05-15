@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace API.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialCreateV2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -79,6 +79,7 @@ namespace API.Migrations
                     OriginalContractStart = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "(getdate())"),
                     CurrentTermStart = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "(getdate())"),
                     CurrentTermEnd = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "(getdate())"),
+                    InvoiceDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     TermLength = table.Column<int>(type: "int", nullable: true),
                     IsAutoRenew = table.Column<bool>(type: "bit", nullable: true),
                     RenewalPriceIncrease = table.Column<decimal>(type: "decimal(5,4)", nullable: true),
@@ -105,10 +106,9 @@ namespace API.Migrations
                 {
                     ID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ServiceID = table.Column<int>(type: "int", nullable: false),
-                    CustomerID = table.Column<int>(type: "int", nullable: false),
                     ContractID = table.Column<int>(type: "int", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: true)
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -117,16 +117,6 @@ namespace API.Migrations
                         name: "FK_RecognitionEvent_Contracts",
                         column: x => x.ContractID,
                         principalTable: "Contracts",
-                        principalColumn: "ID");
-                    table.ForeignKey(
-                        name: "FK_RecognitionEvent_Customers",
-                        column: x => x.CustomerID,
-                        principalTable: "Customers",
-                        principalColumn: "ID");
-                    table.ForeignKey(
-                        name: "FK_RecognitionEvent_Services",
-                        column: x => x.ServiceID,
-                        principalTable: "Services",
                         principalColumn: "ID");
                 });
 
@@ -141,19 +131,23 @@ namespace API.Migrations
                 column: "ServiceID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Customers_Name",
+                table: "Customers",
+                column: "Name",
+                unique: true,
+                filter: "[Name] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RecognitionEvent_ContractID",
                 table: "RecognitionEvent",
                 column: "ContractID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RecognitionEvent_CustomerID",
-                table: "RecognitionEvent",
-                column: "CustomerID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_RecognitionEvent_ServiceID",
-                table: "RecognitionEvent",
-                column: "ServiceID");
+                name: "IX_Services_Name",
+                table: "Services",
+                column: "Name",
+                unique: true,
+                filter: "[Name] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "UQ__Users__536C85E4940523D0",

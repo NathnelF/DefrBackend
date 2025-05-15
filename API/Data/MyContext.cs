@@ -30,6 +30,7 @@ public partial class MyContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+        optionsBuilder.UseSqlite("Data Source=localtest.db;Foreign Keys=True");
 
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)

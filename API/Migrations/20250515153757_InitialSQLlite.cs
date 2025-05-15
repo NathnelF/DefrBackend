@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace API.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreateV2 : Migration
+    public partial class InitialSQLlite : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,9 +15,9 @@ namespace API.Migrations
                 name: "Customers",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: true)
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", unicode: false, maxLength: 50, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -28,11 +28,11 @@ namespace API.Migrations
                 name: "MonthlyBalances",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
                     Month = table.Column<DateTime>(type: "datetime", nullable: true),
                     Year = table.Column<DateTime>(type: "datetime", nullable: true),
-                    Balance = table.Column<decimal>(type: "decimal(18,2)", nullable: true)
+                    Balance = table.Column<decimal>(type: "decimal(18, 2)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -43,9 +43,9 @@ namespace API.Migrations
                 name: "Services",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "varchar(50)", unicode: false, maxLength: 50, nullable: true)
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Name = table.Column<string>(type: "TEXT", unicode: false, maxLength: 50, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -56,11 +56,11 @@ namespace API.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Username = table.Column<string>(type: "varchar(100)", unicode: false, maxLength: 100, nullable: false),
-                    Password = table.Column<string>(type: "varchar(255)", unicode: false, maxLength: 255, nullable: false),
-                    Salt = table.Column<string>(type: "varchar(60)", unicode: false, maxLength: 60, nullable: false)
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Username = table.Column<string>(type: "TEXT", unicode: false, maxLength: 100, nullable: false),
+                    Password = table.Column<string>(type: "TEXT", unicode: false, maxLength: 255, nullable: false),
+                    Salt = table.Column<string>(type: "TEXT", unicode: false, maxLength: 60, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -71,19 +71,19 @@ namespace API.Migrations
                 name: "Contracts",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ServiceID = table.Column<int>(type: "int", nullable: false),
-                    CustomerID = table.Column<int>(type: "int", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    ServiceID = table.Column<int>(type: "INTEGER", nullable: false),
+                    CustomerID = table.Column<int>(type: "INTEGER", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18, 2)", nullable: false),
                     OriginalContractStart = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "(getdate())"),
                     CurrentTermStart = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "(getdate())"),
                     CurrentTermEnd = table.Column<DateTime>(type: "datetime", nullable: true, defaultValueSql: "(getdate())"),
-                    InvoiceDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    TermLength = table.Column<int>(type: "int", nullable: true),
-                    IsAutoRenew = table.Column<bool>(type: "bit", nullable: true),
-                    RenewalPriceIncrease = table.Column<decimal>(type: "decimal(5,4)", nullable: true),
-                    IsChurned = table.Column<bool>(type: "bit", nullable: true)
+                    InvoiceDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    TermLength = table.Column<int>(type: "INTEGER", nullable: true),
+                    IsAutoRenew = table.Column<bool>(type: "INTEGER", nullable: true),
+                    RenewalPriceIncrease = table.Column<decimal>(type: "decimal(5, 4)", nullable: true),
+                    IsChurned = table.Column<bool>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -104,11 +104,11 @@ namespace API.Migrations
                 name: "RecognitionEvent",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ContractID = table.Column<int>(type: "int", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    ContractID = table.Column<int>(type: "INTEGER", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18, 2)", nullable: true),
+                    Date = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -134,8 +134,7 @@ namespace API.Migrations
                 name: "IX_Customers_Name",
                 table: "Customers",
                 column: "Name",
-                unique: true,
-                filter: "[Name] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_RecognitionEvent_ContractID",
@@ -146,8 +145,7 @@ namespace API.Migrations
                 name: "IX_Services_Name",
                 table: "Services",
                 column: "Name",
-                unique: true,
-                filter: "[Name] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "UQ__Users__536C85E4940523D0",

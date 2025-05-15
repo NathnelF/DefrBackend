@@ -6,7 +6,11 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.AddDependencies();
-builder.GetConnection();
+//builder.GetConnection();
+builder.Services.AddDbContext<MyContext>(options =>
+{
+    options.UseSqlite("Data Source=localtest.db");
+});
 
 var app = builder.Build();
 app.UseOpenApi();

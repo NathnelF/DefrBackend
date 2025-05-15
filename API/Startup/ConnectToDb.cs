@@ -6,7 +6,7 @@ namespace API.Startup;
 
 public static class ConnectToDb
 {
-    public static void GetConnection(this WebApplicationBuilder builder)
+    public static void GetConnectionSqlServer(this WebApplicationBuilder builder)
     {
         var connection = String.Empty;
         if (builder.Environment.IsDevelopment())
@@ -15,6 +15,8 @@ public static class ConnectToDb
             connection = builder.Configuration.GetConnectionString("AZURE_SQL_CONNECTIONSTRING");
         }
         else
+        {
+        }
         {
             connection = Environment.GetEnvironmentVariable("AZURE_SQL_CONNECTIONSTRING");
         }
